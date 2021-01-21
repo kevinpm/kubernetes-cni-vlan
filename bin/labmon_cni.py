@@ -170,6 +170,8 @@ class CNIInterface:
         OSexec.exec(f"ip netns add dummy1")
         OSexec.exec(f"ln -sfT {netns} /var/run/netns/{containerid}")
         OSexec.exec(f"ip link add {ifname} type veth peer name {host_if_name}", retry=100)
+        OSexec.exec(f"ip link set dev {host_if_name} mtu 9000")
+        OSexec.exec(f"ip link set dev {ifname} mtu 9000")
         OSexec.exec(f"ip link set {host_if_name} up")
         OSexec.exec(f"ip link set {host_if_name} master {phy_name}")
         OSexec.exec(f"ip link set {ifname} netns {containerid}")
