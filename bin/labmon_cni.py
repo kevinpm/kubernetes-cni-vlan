@@ -156,6 +156,7 @@ class CNIInterface:
         ifname = self.interface_data['interface']
         veth_id = containerid[:4]
         host_if_name = f"veth{veth_id}{self.index}"
+        mtu = self.interface_data['mtu']
 
         OSexec.exec(f"modprobe --first-time 8021q")
         OSexec.exec(f"ip link set {MASTER_INTERFACE_NAME} up")
@@ -170,8 +171,8 @@ class CNIInterface:
         OSexec.exec(f"ip netns add dummy1")
         OSexec.exec(f"ln -sfT {netns} /var/run/netns/{containerid}")
         OSexec.exec(f"ip link add {ifname} type veth peer name {host_if_name}", retry=100)
-        OSexec.exec(f"ip link set dev {host_if_name} mtu 9000")
-        OSexec.exec(f"ip link set dev {ifname} mtu 9000")
+        OSexec.exec(f"ip link set dev {host_if_name} mtu {mtu}}")
+        OSexec.exec(f"ip link set dev {ifname} mtu {mtu}}")
         OSexec.exec(f"ip link set {host_if_name} up")
         OSexec.exec(f"ip link set {host_if_name} master {phy_name}")
         OSexec.exec(f"ip link set {ifname} netns {containerid}")
