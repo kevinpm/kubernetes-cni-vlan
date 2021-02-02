@@ -5,4 +5,5 @@ ADD bin/requirements.txt /app
 RUN pip3 install -r requirements.txt
 COPY bin/labmon_cni.py /app
 ADD bin/bootstrap.sh /app
+COPY bin/ut_cni.py /app
 ENTRYPOINT [ "/bin/sh", "-c", "/app/bootstrap.sh" ]
