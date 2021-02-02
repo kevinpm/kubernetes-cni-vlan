@@ -156,7 +156,11 @@ class CNIInterface:
         ifname = self.interface_data['interface']
         veth_id = containerid[:4]
         host_if_name = f"veth{veth_id}{self.index}"
-        mtu = self.interface_data['mtu']
+        # Check if the MTU annotation exists. If yes, assign the value. If not, assign the default 1500 bytes
+        if hasattr(self.interface_data['mtu']):
+            mtu = self.interface_data['mtu']
+        else:
+            mtu = 1500
 
         OSexec.exec(f"modprobe --first-time 8021q")
         OSexec.exec(f"ip link set {MASTER_INTERFACE_NAME} up")
