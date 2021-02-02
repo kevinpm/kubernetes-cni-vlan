@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Login to DockerHub Registry
       run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
     - name: Get the version
@@ -16,6 +16,8 @@ jobs:
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:11})
     - name: Build the tagged Docker image
       run: docker build .  --tag fsedano/labmon-cni:${{steps.vars.outputs.tag}}
+    - name: UT
+      run: docker-compose up
     - name: Push the tagged Docker image
       run: docker push fsedano/labmon-cni:${{steps.vars.outputs.tag}}
     - name: Set latest
