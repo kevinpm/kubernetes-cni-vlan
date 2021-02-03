@@ -26,6 +26,10 @@ OLD_ANNOTATIONS = {
     "cisco.epfl/vlan_id": "517"
 }
 
+MTU_ANNOTATIONS = {
+    'cisco.epfl/interface_maps':
+        '[{"interface":"net1","vlan":519,"ip":"1.1.1.1","netmask":"","mtu":"9000"},{"interface":"net2","vlan":529,"ip":"2.2.2.2","netmask":"16","mtu":"1500"}]'
+}
 
 def log_exec(arg, retry=0):
     logging.info(f"-> (retry={retry} {arg} <-\n")
@@ -91,6 +95,34 @@ class lmUnitTest(unittest.TestCase):
         labmon_cni_K8s_Params_get_k8s_params.return_value = k8s_params
 
         labmon_cni_K8s_Params_get_annotations.return_value = OLD_ANNOTATIONS
+        K8 = labmon_cni.K8s_CNI()
+        K8.entrypoint()
+
+    @mock.patch('labmon_cni.K8s_Params.get_k8s_params')
+    @mock.patch('labmon_cni.K8s_Params.get_annotations')
+    @mock.patch('labmon_cni.OSexec.exec', log_exec)
+    @mock.patch('labmon_cni.OSexec.exec_get_output', log_exec_with_rc)
+    def test_up_new_style_with_mtu(self,
+                          labmon_cni_K8s_Params_get_annotations,
+                          labmon_cni_K8s_Params_get_k8s_params):
+        k8s_params = MOCKED_K8S_PARAMS
+        k8s_params['CNI_COMMAND'] = 'ADD'
+        labmon_cni_K8s_Params_get_k8s_params.return_value = k8s_params
+        labmon_cni_K8s_Params_get_annotations.return_value = MTU_ANNOTATIONS
+        K8 = labmon_cni.K8s_CNI()
+        K8.entrypoint()
+
+    @mock.patch('labmon_cni.K8s_Params.get_k8s_params')
+    @mock.patch('labmon_cni.K8s_Params.get_annotations')
+    @mock.patch('labmon_cni.OSexec.exec', log_exec)
+    @mock.patch('labmon_cni.OSexec.exec_get_output', log_exec_with_rc)
+    def test_down_new_style_with_mtu(self,
+                            labmon_cni_K8s_Params_get_annotations,
+                            labmon_cni_K8s_Params_get_k8s_params):
+        k8s_params = MOCKED_K8S_PARAMS
+        k8s_params['CNI_COMMAND'] = 'DEL'
+        labmon_cni_K8s_Params_get_k8s_params.return_value = k8s_params
+        labmon_cni_K8s_Params_get_annotations.return_value = MTU_ANNOTATIONS
         K8 = labmon_cni.K8s_CNI()
         K8.entrypoint()
 
