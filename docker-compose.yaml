@@ -5,8 +5,4 @@ services:
     volumes:
       - ./:/app2:delegated
     build: .
-    entrypoint:
-      - /bin/sh
-      - -c
-      - /app/ut.sh
-      
+    entrypoint: ["/usr/bin/python3", "/app/ut_cni.py"]

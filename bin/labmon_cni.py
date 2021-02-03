@@ -157,11 +157,10 @@ class CNIInterface:
         veth_id = containerid[:4]
         host_if_name = f"veth{veth_id}{self.index}"
         # Check if the MTU annotation exists. If yes, assign the value. If not, assign the default 1500 bytes
-        if hasattr(self.interface_data['mtu']):
+        if "mtu" in self.interface_data:
             mtu = self.interface_data['mtu']
         else:
             mtu = 1500
-
         OSexec.exec(f"modprobe --first-time 8021q")
         OSexec.exec(f"ip link set {MASTER_INTERFACE_NAME} up")
         OSexec.exec(f"ip link add link {MASTER_INTERFACE_NAME} name {MASTER_INTERFACE_NAME}.{vlan} type vlan id {vlan}")
@@ -175,8 +174,8 @@ class CNIInterface:
         OSexec.exec(f"ip netns add dummy1")
         OSexec.exec(f"ln -sfT {netns} /var/run/netns/{containerid}")
         OSexec.exec(f"ip link add {ifname} type veth peer name {host_if_name}", retry=100)
-        OSexec.exec(f"ip link set dev {host_if_name} mtu {mtu}}")
-        OSexec.exec(f"ip link set dev {ifname} mtu {mtu}}")
+        OSexec.exec(f"ip link set dev {host_if_name} mtu {mtu}")
+        OSexec.exec(f"ip link set dev {ifname} mtu {mtu}")
         OSexec.exec(f"ip link set {host_if_name} up")
         OSexec.exec(f"ip link set {host_if_name} master {phy_name}")
         OSexec.exec(f"ip link set {ifname} netns {containerid}")
